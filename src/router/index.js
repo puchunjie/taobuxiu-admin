@@ -21,6 +21,7 @@ const mail = resolve => require(['../components/common/mail.vue'], resolve);
 const login = resolve => require(['../components/common/login.vue'], resolve);
 const beSeller = resolve => require(['../components/common/beSeller.vue'], resolve);
 const jumpTo = resolve => require(['../components/seller/jump.vue'], resolve);
+const folow = resolve => require(['../components/seller/folow/index.vue'], resolve);
 
 Vue.use(Router);
 
@@ -125,6 +126,11 @@ export default new Router({
                     path: 'companyManage',
                     name: 'companyManage',
                     component: companyManage
+                },
+                {
+                    path: 'folow',
+                    name: 'folow',
+                    component: folow
                 }
             ]
         },

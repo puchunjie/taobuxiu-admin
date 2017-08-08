@@ -307,3 +307,15 @@ export const ironPush = 'iron/push';
  * 发布不锈钢锈钢信息
  */
 export const handingPush = 'handing/push';
+
+/**
+ * 获取关注列表
+ * GET
+ */
+export const followList = 'member/ironSubscribe';
+
+/**
+ * 保存关注
+ * post
+ */
+export const saveFollow = 'member/ironSubscribe';

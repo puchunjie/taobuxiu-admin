@@ -97,6 +97,11 @@ export default {
                     icon: ''
                 },
                 {
+                    title: '关注范围设置',
+                    name: 'folow',
+                    icon: ''
+                },
+                {
                     title: '现货报价管理',
                     name: 'sProduct',
                     icon: ''
