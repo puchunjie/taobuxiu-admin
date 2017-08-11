@@ -109,6 +109,12 @@ export const translateAllCart = 'order/translateAll';
 export const publishIron = 'iron/buy'
 
 /**
+ * 买家不锈钢求购修改
+ * post
+ */
+export const editPublish = 'iron/editBuy';
+
+/**
  * 买家不锈钢求购列表
  * currentPage   //当前页面
  * pageCount     //每页个数
@@ -122,6 +128,12 @@ export const myBuyList = 'iron/myBuy';
  * ironId   //id
  */
 export const myBuyDetail = 'iron/myBuyDetail';
+
+/**
+ * 买家删除求购
+ * ironId
+ */
+export const deleteIronBuy = 'iron/deleteIronBuy';
 
 
 /**

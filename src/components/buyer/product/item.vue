@@ -19,8 +19,12 @@
                     {{ new Date(itemData.buy.pushTime + itemData.buy.timeLimit) | moment("YYYY年MM月DD日 HH:mm") }}
                 </span>
             </div>
-            <h3 class="elli">
+            <h3 class="eill">
                 {{ `${ itemData.buy.ironType } | ${ itemData.buy.material }| ${ itemData.buy.surface }| ${ itemData.buy.proPlace }` }}
+                <Icon type="trash-a" size="20" @click.native="deleteBuyConf(itemData.buy.id)"></Icon>
+                <Icon type="edit" size="20" 
+                @click.native="jumpToEdit(itemData.buy.id)"
+                v-if="itemData.buy.editStatus === 0"></Icon>
             </h3>
             <p class="state">
                 {{ `${ itemData.buy.height }*${ itemData.buy.width }*${ itemData.buy.length } | 公差 ${ itemData.buy.tolerance } | ${ itemData.buy.numbers }${ itemData.buy.unit } | 收货地：${ itemData.buy.sourceCity }` }}
@@ -88,16 +92,31 @@
                 </table>
             </div>
         </div>
+        <!-- 编辑框 -->
+        <Modal v-model="editShow" @on-cancel="id = ''">
+            <p slot="header" style="color:#f60;text-align:center">
+                <Icon type="information-circled"></Icon>
+                <span>编辑</span>
+            </p>
+            <div style="width:400px">
+                <product-edit :ironId="id" ref="edit"></product-edit>
+            </div>
+            <div slot="footer">
+                <Button type="error" size="large" @click="doEdit" long>确认修改</Button>
+            </div>
+        </Modal>
     </div>
 </template>
 
 
 <script>
 import countDown from '@/components/com/countDown'
-import { selectSupply } from '@/utils/http'
+import productEdit from '@/components/buyer/releaseWTB/productFrom'
+import { selectSupply, deleteIronBuy } from '@/utils/http'
 export default {
     components: {
-        countDown
+        countDown,
+        productEdit
     },
     props:{
         itemData:{
@@ -112,6 +131,8 @@ export default {
     },
     data(){
         return {
+            editShow: false,
+            id: '',//编辑求购ID
             headList:[{
                 title:'时间',
                 width:120,
@@ -141,7 +162,8 @@ export default {
                 title:'操作',
                 width:90,
                 algin:'center'
-            }]
+            }],
+            
         }
     },
     methods: {
@@ -177,7 +199,40 @@ export default {
             }catch(e){} 
 
             return Number(s1.replace(".",""))*Number(s2.replace(".",""))/Math.pow(10,m) 
-        } 
+        },
+        // 删除求购
+        deleteBuyConf(id){
+            let _this = this;
+            this.$Modal.confirm({
+                content: '删除后无法撤销，是否继续？',
+                onOk(){
+                    _this.deleteBuy(id);
+                }
+            })
+        },
+        //删除求购
+        deleteBuy(id){
+            this.$http.post(deleteIronBuy,{
+                ironId: id
+            }).then(res => {
+                if(res.data.status === 0){
+                    this.$emit('on-delete')
+                }else{
+                    this.$Message.error(res.data.errorMsg);
+                }
+            })
+        },
+        // 编辑求购
+        jumpToEdit(id){
+            this.id = id;
+            this.editShow = true;
+        },
+        // 调用子组件编辑事件
+        doEdit(){
+            this.$refs.edit.doEdit();
+            this.editShow = false;
+            this.$emit('on-delete')
+        }
     }
 }
 </script>
@@ -311,5 +366,11 @@ export default {
     }
     .bts{
         border-top: 1px solid #ccc;
+    }
+
+    .eill .ivu-icon{
+        float: right;
+        margin-left: 10px;
+        cursor: pointer;
     }
 </style>

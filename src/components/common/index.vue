@@ -129,9 +129,7 @@ export default {
         },
         methods: {
             routeTo(e) {
-                this.$router.push({ 
-                    name: e
-                });
+                this.$router.push({ name: e });
             },
             jump(params){
                 this.$router.push({ 

@@ -63,7 +63,7 @@
             </Row>
         </Form-item>
         <Form-item label="交货地点" class="ivu-form-item-required">
-            <Cascader :data="citys" placeholder="请选择交货地点" v-model="formValidate.locationCityIds" size="small" style="margin-top:5px"></Cascader>
+            <Cascader :data="citys" :placeholder="isEdit? locationStr : '请选择交货地点'" v-model="formValidate.locationCityIds" size="small" style="margin-top:5px"></Cascader>
         </Form-item>
         <Form-item label="备注内容">
             <Input v-model="formValidate.message" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入备注内容"></Input>
@@ -90,7 +90,7 @@
                 <Col span="2" style="text-align: center">分</Col>
             </Row>
         </Form-item>
-        <Form-item>
+        <Form-item v-if="!isEdit">
             <Button type="primary" @click="handleSubmit('formValidate')" :loading="ajaxLoading">提交</Button>
         </Form-item>
     </Form>
@@ -98,8 +98,11 @@
 
 <script>
     import { ironTypes, surfaces, materials, proPlaces, units, citys } from '@/utils/data'
-    import { publishIron } from '@/utils/http'
+    import { publishIron, myBuyDetail, editPublish } from '@/utils/http'
     export default {
+        props:{
+            ironId: String
+        },
         created () {
             let _this = this;
             setTimeout(function(){
@@ -110,6 +113,14 @@
             this.materials = materials;
             this.proPlaces = proPlaces;
             this.units = units;
+        },
+        computed: {
+            checkForm(){
+                return this.formValidate.height !='' && this.formValidate.width!='' && this.formValidate.length!='' && this.formValidate.locationCityId != undefined
+            },
+            isEdit(){
+                return this.ironId != '' && this.ironId != undefined
+            }  
         },
         data () {
             return {
@@ -139,16 +150,19 @@
                     day: 1,
                     hour: 0,
                     minute: 0
-                }
+                },
+                locationStr: ''
             }
         },
         methods: {
             // 提交表单
-            handleSubmit (name) {
-                this.formValidate.locationCityId = this.formValidate.locationCityIds[this.formValidate.locationCityIds.length - 1];
-                if(this.checkForm()){
+            handleSubmit () {
+                if(!this.isEdit)
+                    this.formValidate.locationCityId = this.formValidate.locationCityIds[this.formValidate.locationCityIds.length - 1];
+                if(this.checkForm){
                     this.ajaxLoading = true;
-                    this.$http.post(publishIron,this.formValidate,{
+                    let apiUrl = this.isEdit ? editPublish : publishIron;
+                    this.$http.post(apiUrl,this.formValidate,{
                         headers: { 'Content-Type': 'multipart/form-data' }
                     }).then(res => {
                         if(res.data.status === 0){
@@ -167,21 +181,70 @@
             transformDeadline(){
                 this.formValidate.timeLimit = (this.formValidate.day * 86400 + this.formValidate.hour * 3600 + this.formValidate.minute * 60) * 1000
             },
-            checkForm(){
-                return this.formValidate.height !='' && this.formValidate.width!='' && this.formValidate.length!='' && this.formValidate.locationCityId != undefined
+            // 获取求购数据
+            getDetial(id){
+                this.activeItemajaxLoad = false;
+                // 拿到详情数据id
+                this.$http.get(myBuyDetail,{
+                    params:{
+                         ironId: id
+                    }
+                }).then(res => {
+                    let data = res.data.data.buy;
+                    // 把获取到的数据填充
+                    if(res.data.status === 0){
+                        // 同步时间
+                        let allTime = data.timeLimit/86400000; 
+                        let day = parseInt(allTime);
+                        let hour = parseInt(data.timeLimit%86400000/1000/3600);
+                        let minute = data.timeLimit%86400000%3600000/1000/60;
+                        this.formValidate.ironType = data.ironType;
+                        this.formValidate.surface = data.surface;
+                        this.formValidate.material = data.material;
+                        this.formValidate.proPlace = data.proPlace;
+                        this.formValidate.height = data.height;
+                        this.formValidate.width = data.width;
+                        this.formValidate.length = data.length;
+                        this.formValidate.toleranceFrom = Number(data.tolerance.split("-")[0]);
+                        this.formValidate.toleranceTo = Number(data.tolerance.split("-")[1]);
+                        this.formValidate.numbers = data.numbers;
+                        this.formValidate.unit = data.unit;
+                        this.formValidate.locationCityId = data.locationCityId;
+                        this.formValidate.message = data.message;
+                        this.formValidate.timeLimit = data.timeLimit;
+                        this.formValidate.day = day;
+                        this.formValidate.hour = hour;
+                        this.formValidate.minute = minute;
+                        this.locationStr = data.sourceCity;
+                    }else{
+                        this.$Message.error(res.data.errorMsg);
+                    }
+                })
+            },
+            // 执行编辑
+            doEdit(){
+                this.$set(this.formValidate,'ironId',this.ironId);
+                this.handleSubmit();
+            }
+        },
+        watch: {
+            'formValidate.day'(){
+                this.transformDeadline();
+            },
+            'formValidate.hour'(){
+                this.transformDeadline();
+            },
+            'formValidate.minute'(){
+                this.transformDeadline();
+            },
+            'ironId'(){
+                if(this.isEdit){
+                    this.getDetial(this.ironId)
+                }
             }
         },
         mounted () {
             this.transformDeadline();
-            this.$watch('formValidate.day', function (newVal, oldVal) {
-                this.transformDeadline();
-            });
-            this.$watch('formValidate.hour', function (newVal, oldVal) {
-                this.transformDeadline();
-            });
-            this.$watch('formValidate.minute', function (newVal, oldVal) {
-                this.transformDeadline();
-            });
         }
     }
 </script>
