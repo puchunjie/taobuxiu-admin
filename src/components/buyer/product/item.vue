@@ -132,7 +132,6 @@ export default {
     data(){
         return {
             editShow: false,
-            id: '',//编辑求购ID
             headList:[{
                 title:'时间',
                 width:120,
@@ -224,7 +223,7 @@ export default {
         },
         // 编辑求购
         jumpToEdit(id){
-            this.id = id;
+            this.$refs.edit.getDetial(id);
             this.editShow = true;
         },
         // 调用子组件编辑事件

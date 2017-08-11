@@ -100,9 +100,6 @@
     import { ironTypes, surfaces, materials, proPlaces, units, citys } from '@/utils/data'
     import { publishIron, myBuyDetail, editPublish } from '@/utils/http'
     export default {
-        props:{
-            ironId: String
-        },
         created () {
             let _this = this;
             setTimeout(function(){
@@ -124,6 +121,7 @@
         },
         data () {
             return {
+                ironId:'',
                 ajaxLoading:false,
                 citys: [],
                 ironTypes: [],
@@ -183,6 +181,7 @@
             },
             // 获取求购数据
             getDetial(id){
+                this.ironId = id;
                 this.activeItemajaxLoad = false;
                 // 拿到详情数据id
                 this.$http.get(myBuyDetail,{
@@ -236,11 +235,6 @@
             },
             'formValidate.minute'(){
                 this.transformDeadline();
-            },
-            'ironId'(){
-                if(this.isEdit){
-                    this.getDetial(this.ironId)
-                }
             }
         },
         mounted () {
