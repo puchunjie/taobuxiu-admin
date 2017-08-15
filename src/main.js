@@ -29,8 +29,8 @@ router.afterEach((to, from, next) => {
 axios.defaults.timeout = 5000; //响应时间
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'; //配置请求头
 // axios.defaults.baseURL = '/'; //配置接口地址
-axios.defaults.baseURL = 'http://192.168.0.251'; //配置接口地址
-// axios.defaults.baseURL = 'http://118.178.17.15:9090'; //配置接口地址
+// axios.defaults.baseURL = 'http://192.168.0.251'; //配置接口地址
+axios.defaults.baseURL = 'http://118.178.17.15:9090'; //配置接口地址
 // axios.defaults.baseURL = 'http://www.itaobuxiu.com'; //配置接口地址
 axios.defaults.withCredentials = true;
 //POST传参序列化(添加请求拦截器)

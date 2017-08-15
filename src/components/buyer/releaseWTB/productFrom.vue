@@ -24,10 +24,14 @@
             <Input v-model="formValidate.height" size="small" style="width:100px"></Input> mm
         </Form-item>
         <Form-item label="宽度" class="ivu-form-item-required">
-            <Input v-model="formValidate.width" size="small" style="width:100px"></Input> mm
+            <Input v-model="formValidate.width" size="small" style="width:100px"
+            @on-blur="tipShow = false" 
+            @on-focus="showTip('126px')"></Input> mm
         </Form-item>
         <Form-item label="长度" class="ivu-form-item-required">
-            <Input v-model="formValidate.length" size="small" style="width:100px"></Input> mm
+            <Input v-model="formValidate.length" size="small" style="width:100px" 
+            @on-blur="tipShow = false"
+            @on-focus="showTip('183px')"></Input> mm
         </Form-item>
         <Form-item label="公差" class="ivu-form-item-required">
             <Row>
@@ -93,6 +97,12 @@
         <Form-item v-if="!isEdit">
             <Button type="primary" @click="handleSubmit('formValidate')" :loading="ajaxLoading">提交</Button>
         </Form-item>
+
+        <ul class="tip-content" :class="{'tip-show':tipShow}" ref="popTip">
+            <li v-for="(item,index) in tipList" :key="index" class="vux-1px-b" @click="fillData(item)">
+                宽度：{{ item.split('*')[0] }} 长度：{{ item.split('*')[1] }}
+            </li> 
+        </ul>
     </Form>
 </template>
 
@@ -121,6 +131,8 @@
         },
         data () {
             return {
+                tipShow: false,
+                tipList: [],
                 ironId:'',
                 ajaxLoading:false,
                 citys: [],
@@ -224,6 +236,35 @@
             doEdit(){
                 this.$set(this.formValidate,'ironId',this.ironId);
                 this.handleSubmit();
+            },
+            // 显示提示
+            showTip(top){
+                if(this.formValidate.ironType === '不锈钢板' && this.formValidate.surface === '2B'){
+                    this.tipList = ['1000*2000','1219*2438','1500*3000','1800*3000','2000*3000'];
+                    this.$refs.popTip.style.top = top;
+                    this.tipShow = true;
+                }else if(this.formValidate.ironType === '不锈钢板' && this.formValidate.surface === 'No.1'){
+                    this.tipList = ['1500*6000','1800*6000','2000*6000','1240*6000','2500*6000'];
+                    this.$refs.popTip.style.top = top;
+                    this.tipShow = true;
+                }else if(this.formValidate.ironType === '不锈钢卷' && this.formValidate.surface === '2B'){
+                    this.tipList = ['1000*C','1219*C','1500*C','1800*C','2000*C'];
+                    this.$refs.popTip.style.top = top;
+                    this.tipShow = true;
+                }else if(this.formValidate.ironType === '不锈钢卷' && this.formValidate.surface === 'No.1'){
+                    this.tipList = ['1500*C，毛边' , '1800*C，毛边', '2000*C，毛边' , '1240*C，毛边'];
+                    this.$refs.popTip.style.top = top;
+                    this.tipShow = true;
+                }
+            },
+            // 填充数据
+            fillData(item){
+                let data = item.split("*");
+                let width = data[0];
+                let length = data[1];
+                this.formValidate.width = width;
+                this.formValidate.length = length;
+                this.tipShow = false;
             }
         },
         watch: {
@@ -242,3 +283,30 @@
         }
     }
 </script>
+
+<style scoped>
+    .tip-content{
+        position: absolute;
+        top: 286px;
+        left: 100px;
+        width: 165px;
+        background-color:#007de4;
+        height: 0;
+        transition: all .3s;
+        margin:0 auto;
+        border-radius:5px;
+        font-size: 12px;
+        overflow: hidden;
+        
+    }
+    .tip-content li{
+        text-indent: 10px;
+        line-height: 40px;
+        cursor: pointer;
+        color: #fff;
+    }
+    .tip-show{
+        height: 160px;
+    }
+</style>
+

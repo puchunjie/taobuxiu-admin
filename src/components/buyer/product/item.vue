@@ -21,10 +21,12 @@
             </div>
             <h3 class="eill">
                 {{ `${ itemData.buy.ironType } | ${ itemData.buy.material }| ${ itemData.buy.surface }| ${ itemData.buy.proPlace }` }}
-                <Icon type="trash-a" size="20" @click.native="deleteBuyConf(itemData.buy.id)"></Icon>
+                <Icon type="trash-a" size="20"
+                v-if="itemData.buy.status === 0"
+                @click.native="deleteBuyConf(itemData.buy.id)"></Icon>
                 <Icon type="edit" size="20" 
                 @click.native="jumpToEdit(itemData.buy.id)"
-                v-if="itemData.buy.editStatus === 0"></Icon>
+                v-if="itemData.buy.editStatus === 0 && itemData.buy.status === 0"></Icon>
             </h3>
             <p class="state">
                 {{ `${ itemData.buy.height }*${ itemData.buy.width }*${ itemData.buy.length } | 公差 ${ itemData.buy.tolerance } | ${ itemData.buy.numbers }${ itemData.buy.unit } | 收货地：${ itemData.buy.sourceCity }` }}

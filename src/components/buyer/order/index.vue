@@ -18,6 +18,12 @@
                 <Page :total="waitForVote" show-total v-show="waitForVote>0" @on-change="pageChange" :current="currentPage+1"></Page>
             </div>
         </Tab-pane>
+        <Tab-pane :label="'已评价('+ hasForVote +')'">
+            <div class="table-content">
+                <order-listtable :dataList="orderData"></order-listtable>
+                <Page :total="hasForVote" show-total v-show="hasForVote>0" @on-change="pageChange" :current="currentPage+1"></Page>
+            </div>
+        </Tab-pane>
     </Tabs>
 </template>
 
@@ -36,6 +42,7 @@ export default {
             orderData:[],
             waitForConfirm:0,
             waitForVote:0,
+            hasForVote: 0,
             maxCount:0,
             currentPage:0,
             status: -1
@@ -66,6 +73,7 @@ export default {
                     this.orderData = data.orders;
                     this.waitForVote = data.waitForVote;
                     this.waitForConfirm = data.waitForConfirm;
+                    this.hasForVote = data.hasEvaluate;
                     this.maxCount = data.allCounts;
                 }else{
                     this.$Message.error(res.data.errorMsg)
@@ -79,7 +87,6 @@ export default {
             this.getOrderData();
         },
         reset(name){
-            console.log(name)
             switch (name) {
                 case 0:
                     this.status = -1;
@@ -89,6 +96,9 @@ export default {
                     break;
                 case 2:
                     this.status = 1;
+                    break;
+                case 3:
+                    this.status = 2;
                     break;
                 default:
                     break;
