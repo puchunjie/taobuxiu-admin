@@ -101,7 +101,7 @@
                 <span>编辑</span>
             </p>
             <div style="width:400px">
-                <product-edit :ironId="id" ref="edit"></product-edit>
+                <product-edit ref="edit"></product-edit>
             </div>
             <div slot="footer">
                 <Button type="error" size="large" @click="doEdit" long>确认修改</Button>

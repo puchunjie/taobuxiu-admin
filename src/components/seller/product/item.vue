@@ -92,7 +92,7 @@
                         </Form-item>
                         <Form-item>
                             <Button type="primary" @click="handleSubmit">立即报价</Button>
-                            <Button type="warning" @click="setMissing" style="margin-left: 8px">遗憾错过</Button>
+                            <Button type="warning" @click="setMissingConf" style="margin-left: 8px">遗憾错过</Button>
                         </Form-item>
                     </Form>
 
@@ -180,6 +180,16 @@ export default {
                     }
                 });
             }
+        },
+        // 忽略报价
+        setMissingConf(){
+            let _this = this;
+            this.$Modal.confirm({
+                content:'忽略有将无法继续报价！是否继续？',
+                onOk () {
+                    _this.setMissing();
+                }
+            })
         },
         setMissing () {
             let _this = this;

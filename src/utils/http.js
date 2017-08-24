@@ -172,6 +172,19 @@ export const bmyHandingBuyDetail = 'handing/myBuyDetail';
 export const hselectSupply = 'handing/selectSupply';
 
 /**
+ * 买家删除加工求购
+ * handingId
+ */
+export const deleteHandingBuy = 'handing/deleteHandingBuy';
+
+/**
+ * 买家加工求购修改
+ * post
+ * handingId
+ */
+export const editMaching = 'handing/editBuy';
+
+/**
  * 积分
  */
 export const bIntegral = 'member/myIntegral';
@@ -264,6 +277,12 @@ export const myHandingBuyDetail = 'seller/myHandingBuyDetail';
 export const offerHandingBuy = 'seller/offerHandingBuy';
 
 /**
+ * 卖家点击忽略报价-加工
+ * handingId
+ */
+export const missMachingBuyOffer = 'seller/missHandingBuyOffer';
+
+/**
  * 卖家店铺现货列表
  * currentPage  
  * pageCount
@@ -316,7 +335,7 @@ export const sIntegral = 'seller/myIntegral';
 export const ironPush = 'iron/push';
 
 /**
- * 发布不锈钢锈钢信息
+ * 发布加工信息
  */
 export const handingPush = 'handing/push';
 

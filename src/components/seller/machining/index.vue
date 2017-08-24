@@ -4,7 +4,7 @@
             <div class="status-tab clearfix">
                 <div class="item" v-for="(item,index) in tabList" 
                 :class="index === activeTab ? 'active' : ''"
-                @click="changeDate(item,index)">
+                @click="changeDate(index)">
                     <p>{{ item.title }}</p>
                     <p>({{ item.count }})</p>
                 </div>
@@ -58,11 +58,30 @@
         data(){
             return{
                 tabList:[{
-                        sort: 0,
-                        title:'所有报价',
-                        count: 0,
-                        status: -1
-                    }],
+                    title:'所有报价',
+                    count: 0,
+                    status: -1
+                },
+                {
+                    title:'待报价',
+                    count: 0,
+                    status: 0
+                },
+                {
+                    title:'等待中',
+                    count: 0,
+                    status: 3
+                },
+                {
+                    title:'已成交',
+                    count: 0,
+                    status: 4
+                },
+                {
+                    title:'未中标',
+                    count: 0,
+                    status: 6
+                }],
                 salesManPhone:'',//服务顾问电话    
                 activeTab:0,  //选中TAB选项下标
                 itemList:[], //列表数据
@@ -90,20 +109,33 @@
                 this.itemListLoad = false  
                 this.getBuyData()
             },
+            // tab数据切换
+            changeDate(index){
+                this.activeItemajaxLoad = false;
+                this.activeTab = index;
+                this.currentPage = 0;
+                this.activeItemIndex = 0;
+                this.getBuyData();
+            },
             //获取列表数据
-            getBuyData(pageCount){
+            getBuyData(){
                 this.itemListLoad = false;
                 this.$http.get(myHandingBuys,{
                     params:{
                         currentPage : this.currentPage,
-                        pageCount : pageCount || this.pageCount
+                        pageCount : this.pageCount,
+                        status: this.tabList[this.activeTab].status
                     }
                 }).then(res => {
                     let data = res.data.data;
                     this.itemList = data.handings;
                     this.maxCount = data.maxCount;
                     this.itemListLoad = true;
-                    this.tabList[0].count = data.maxCount;
+                    this.tabList[0].count = data.allCounts;
+                    this.tabList[1].count = data.waitCount;
+                    this.tabList[2].count = data.waitIngCount;
+                    this.tabList[3].count = data.winningBidCount;
+                    this.tabList[4].count = data.noWinningBidCount;
                     if(this.itemList[0]){
                         this.getDetial(this.itemList[0].id)
                     }else{
@@ -146,10 +178,11 @@
                     case 4:
                         ststusStr = '已成交'
                         break;   
-                    case 1:
-                        ststusStr = '已失效'
+                    case 6:
+                        ststusStr = '未中标'
                         break;     
                     default:
+                        ststusStr = '已失效'
                         break;
                 }
                 return ststusStr;

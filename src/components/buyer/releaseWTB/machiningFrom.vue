@@ -6,7 +6,8 @@
             </Select>
         </Form-item>
         <Form-item label="加工地点" class="ivu-form-item-required">
-            <Cascader :data="citys" v-model="formValidate.souCityIds" size="small" style="margin-top:5px"></Cascader>
+            <Cascader :data="citys" v-model="formValidate.souCityIds" size="small"
+            :placeholder="isEdit? locationStr : '请选择'" style="margin-top:5px"></Cascader>
         </Form-item>
         <Form-item label="发布标题">
             <Input v-model="formValidate.message" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入备注内容"></Input>
@@ -33,7 +34,7 @@
                 <Col span="2" style="text-align: center">分</Col>
             </Row>
         </Form-item>
-        <Form-item>
+        <Form-item v-if="!isEdit">
             <Button type="primary" @click="handleSubmit('formValidate')" :loading="ajaxLoading">提交</Button>
         </Form-item>
     </Form>
@@ -41,20 +42,14 @@
 
 <script>
     import { machiningTypes, citys } from '@/utils/data'
-    import { publishHanding } from '@/utils/http'
+    import { publishHanding, bmyHandingBuyDetail, editMaching } from '@/utils/http'
     export default {
-        created () {
-            let _this = this;
-            this.machiningTypes = machiningTypes;
-            setTimeout(function(){
-                _this.citys = citys;
-            },500)
-        },
         data () {
             return {
+                handingId: '',
                 ajaxLoading:false,
-                machiningTypes: [],
-                citys:[],
+                machiningTypes: machiningTypes,
+                citys:citys,
                 formValidate: {
                     handingType:'整卷油磨',
                     souCityIds: [],
@@ -64,16 +59,27 @@
                     day: 1,
                     hour: 0,
                     minute: 0
-                }
+                },
+                locationStr: ''
             }
+        },
+        computed: {
+            checkForm(){
+                return this.formValidate.souCityId != undefined
+            },
+            isEdit(){
+                return this.handingId != '' && this.handingId != undefined
+            }  
         },
         methods: {
             // 提交表单
-            handleSubmit (name) {
-                this.formValidate.souCityId = this.formValidate.souCityIds[this.formValidate.souCityIds.length - 1];
-                if(this.checkForm()){
+            handleSubmit () {
+                if(!this.isEdit)
+                    this.formValidate.souCityId = this.formValidate.souCityIds[this.formValidate.souCityIds.length - 1];
+                if(this.checkForm){
                     this.ajaxLoading = true;
-                    this.$http.post(publishHanding,this.formValidate,{
+                    let apiUrl = this.isEdit ? editMaching : publishHanding;
+                    this.$http.post(apiUrl,this.formValidate,{
                         headers: { 'Content-Type': 'multipart/form-data' }
                     }).then(res => {
                         if(res.data.status === 0){
@@ -92,15 +98,55 @@
             transformDeadline(){
                 this.formValidate.timeLimit = (this.formValidate.day * 86400 + this.formValidate.hour * 3600 + this.formValidate.minute * 60) * 1000
             },
-            checkForm(){
-                return this.formValidate.souCityId != undefined
+            //获取资源详情
+            getDetial(id){
+                this.handingId = id;
+                this.activeItemajaxLoad = false;
+                // 拿到详情数据id
+                this.$http.get(bmyHandingBuyDetail,{
+                    params:{
+                         handingId: id
+                    }
+                }).then(res => {
+                    let data = res.data.data.buy;
+                    if(res.data.status === 0){
+                        // 同步时间
+                        let allTime = data.timeLimit/86400000; 
+                        let day = parseInt(allTime);
+                        let hour = parseInt(data.timeLimit%86400000/1000/3600);
+                        let minute = data.timeLimit%86400000%3600000/1000/60;
+                        this.formValidate.day = day;
+                        this.formValidate.hour = hour;
+                        this.formValidate.minute = minute;
+                        this.formValidate.handingType = data.handingType;
+                        this.formValidate.message = data.message;
+                        this.formValidate.souCityId = data.souCityId;
+                        this.locationStr = data.sourceCity;
+                        
+                    }else{
+                        this.$Message.error(res.data.errorMsg);
+                    }
+                })
+            },
+            // 执行编辑
+            doEdit(){
+                this.$set(this.formValidate,'handingId',this.handingId);
+                this.handleSubmit();
+            },
+        },
+        watch: {
+            'formValidate.day'(){
+                this.transformDeadline();
+            },
+            'formValidate.hour'(){
+                this.transformDeadline();
+            },
+            'formValidate.minute'(){
+                this.transformDeadline();
             }
         },
         mounted () {
             this.transformDeadline();
-            this.$watch('formValidate.day', function (newVal, oldVal) {
-                this.transformDeadline();
-            });
         }
     }
 </script>

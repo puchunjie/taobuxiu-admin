@@ -110,17 +110,6 @@
     import { ironTypes, surfaces, materials, proPlaces, units, citys } from '@/utils/data'
     import { publishIron, myBuyDetail, editPublish } from '@/utils/http'
     export default {
-        created () {
-            let _this = this;
-            setTimeout(function(){
-                _this.citys = citys;
-            },500)
-            this.ironTypes = ironTypes;
-            this.surfaces = surfaces;
-            this.materials = materials;
-            this.proPlaces = proPlaces;
-            this.units = units;
-        },
         computed: {
             checkForm(){
                 return this.formValidate.height !='' && this.formValidate.width!='' && this.formValidate.length!='' && this.formValidate.locationCityId != undefined
@@ -134,12 +123,12 @@
                 tipList: [],
                 ironId:'',
                 ajaxLoading:false,
-                citys: [],
-                ironTypes: [],
-                surfaces: [],
-                materials: [],
-                proPlaces: [],
-                units: [],
+                citys: citys,
+                ironTypes: ironTypes,
+                surfaces: surfaces,
+                materials: materials,
+                proPlaces: proPlaces,
+                units: units,
                 formValidate: {
                     ironType: '不锈钢卷',//品类
                     surface: 'No.1',//表面

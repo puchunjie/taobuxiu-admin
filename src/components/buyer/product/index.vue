@@ -40,7 +40,7 @@
                 size="small" v-show="maxCount>0"></Page>
             </div>
             <div class="item-detail" v-show="itemList[0]">
-                <w-item :itemData="activeItem" :ajaxLoad="activeItemajaxLoad" @on-delete="resetList"></w-item>
+                <w-item :itemData="activeItem" :ajaxLoad="activeItemajaxLoad" @on-delete="init"></w-item>
             </div>
         </div>
     </div>
@@ -189,9 +189,6 @@
                     this.getDetial(id);
                     this.activeItemIndex = index;
                 }
-            },
-            resetList(){
-                this.init();
             }
         }
     }

@@ -3,7 +3,8 @@
         <div class="want-header">
             <div class="status-tab clearfix">
                 <div class="item" v-for="(item,index) in tabList" 
-                :class="index === activeTab ? 'active' : ''">
+                :class="index === activeTab ? 'active' : ''" :key="index"
+                @click="changeDate(index)">
                     <p>{{ item.title }}</p>
                     <p>({{ item.count }})</p>
                 </div>
@@ -15,7 +16,7 @@
                 <div class="item-content">
                     <div class="item" v-for="(item,index) in itemList" 
                     :class="activeItemIndex === index ? 'active' : ''"
-                    @click="switchItme(item.id,index)">
+                    @click="switchItme(item.id,index)" :key="index">
                         <h3 class="elli">{{ item.handingType }}</h3>
                         <p class="state">{{ item.message }}&nbsp;</p>
                         <p class="note">{{ item.sourceCity }}</p>
@@ -39,7 +40,7 @@
                 size="small" v-show="maxCount>0"></Page>
             </div>
             <div class="item-detail" v-show="itemList[0]">
-                <w-item :itemData="activeItem" :ajaxLoad="activeItemajaxLoad"></w-item>
+                <w-item :itemData="activeItem" :ajaxLoad="activeItemajaxLoad" @on-delete="init"></w-item>
             </div>
         </div>
     </div>
@@ -57,11 +58,29 @@
         data(){
             return{
                 tabList:[{
-                        sort: 0,
-                        title:'所有报价',
-                        count: 0,
-                        status: -1
-                    }],
+                    sort: 0,
+                    title:'所有报价',
+                    count: 0,
+                    status: -1
+                },
+                {
+                    sort: 0,
+                    title:'进行中',
+                    count: 0,
+                    status: 0
+                },
+                {
+                    sort: 0,
+                    title:'已成交',
+                    count: 0,
+                    status: 1
+                },
+                {
+                    sort: 0,
+                    title:'已取消',
+                    count: 0,
+                    status: 2
+                }],
                 salesManPhone:'',//服务顾问电话
                 activeTab:0,  //选中TAB选项下标
                 itemList:[], //列表数据
@@ -89,20 +108,32 @@
                 this.itemListLoad = false  
                 this.getBuyData()
             },
+            // tab数据切换
+            changeDate(index){
+                this.activeItemajaxLoad = false;
+                this.activeTab = index;
+                this.currentPage = 0;
+                this.activeItemIndex = 0;
+                this.getBuyData();
+            },
             //获取列表数据
-            getBuyData(pageCount){
+            getBuyData(){
                 this.itemListLoad = false;
                 this.$http.get(bmyHandingBuys,{
                     params:{
                         currentPage : this.currentPage,
-                        pageCount : pageCount || this.pageCount
+                        pageCount : this.pageCount,
+                        status: this.tabList[this.activeTab].status
                     }
                 }).then(res => {
                     let data = res.data.data;
                     this.itemList = data.handings;
                     this.maxCount = data.maxCount;
                     this.itemListLoad = true;
-                    this.tabList[0].count = data.maxCount;
+                    this.tabList[0].count = data.allCounts;
+                    this.tabList[1].count = data.progressCount;
+                    this.tabList[2].count = data.confirmedCount;
+                    this.tabList[3].count = data.canceledCount;
                     if(this.itemList[0]){
                         this.getDetial(this.itemList[0].id)
                     }else{

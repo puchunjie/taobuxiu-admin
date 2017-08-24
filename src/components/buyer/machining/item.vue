@@ -19,8 +19,14 @@
                     {{ new Date(itemData.buy.pushTime + itemData.buy.timeLimit) | moment("YYYY年MM月DD日 HH:mm") }}
                 </span>
             </div>
-            <h3 class="elli">
+            <h3 class="eill">
                 {{ itemData.buy.handingType }}
+                <Icon type="trash-a" size="20"
+                v-if="itemData.buy.status === 0"
+                @click.native="deleteBuyConf(itemData.buy.id)"></Icon>
+                <Icon type="edit" size="20" 
+                @click.native="jumpToEdit(itemData.buy.id)"
+                v-if="itemData.buy.editStatus === 0 && itemData.buy.status === 0"></Icon>
             </h3>
             <p class="note">
                  备注：{{ itemData.buy.message }}
@@ -38,7 +44,7 @@
             </div>
             <div class="table-content">
                 <Spin fix v-if="!ajaxLoad">加载中...</Spin>
-                <div class="no-data" v-if="itemData.supplies.length === 0">暂时没有数据</div>
+                <div class="no-data" v-if="itemData.supplies.length === 0 && itemData.missSupplies.length === 0">暂时没有数据</div>
                 <table v-else>
                     <tr v-for="item in itemData.supplies">
                         <td class="date" :style="{width:headList[0].width+'px'}">
@@ -65,19 +71,51 @@
                             <a v-if="itemData.buy.status === 1 && item.isWinner" class="action-btn status1">已中标</a>
                         </td>
                     </tr>
+                    <!--错过列表-->
+                    <tr v-for="(item,index) in itemData.missSupplies" :class="index === 0 ? 'bts' : ''">
+                        <td class="date" :style="{width:headList[0].width+'px'}">
+                            <div>{{ new Date(item.offerTime) | moment("YYYY年MM月DD日 HH:mm") }}</div>
+                        </td>
+                        <td class="company" :style="{width:headList[1].width+'px'}">
+                            <div>
+                                <p>{{ item.companyName }}</p>
+                                <p>{{ item.contact }}: {{ item.mobile }}</p>
+                                <!--<p>综合评分：{{ item.score }}</p>-->
+                                <p>抢单成功次数：{{ item.winningTimes }}</p>
+                            </div>
+                        </td>
+                        <td class="font-red"  colspan="4">
+                            忽略（无计划或无货）
+                        </td>
+                    </tr>
                 </table>
             </div>
         </div>
+        <!-- 编辑框 -->
+        <Modal v-model="editShow">
+            <p slot="header" style="color:#f60;text-align:center">
+                <Icon type="information-circled"></Icon>
+                <span>编辑</span>
+            </p>
+            <div style="width:400px">
+                <maching-edit ref="edit"></maching-edit>
+            </div>
+            <div slot="footer">
+                <Button type="error" size="large" @click="doEdit" long>确认修改</Button>
+            </div>
+        </Modal>
     </div>
 </template>
 
 
 <script>
 import countDown from '@/components/com/countDown'
-import { hselectSupply } from '@/utils/http'
+import machingEdit from '@/components/buyer/releaseWTB/machiningFrom'
+import { hselectSupply, deleteHandingBuy } from '@/utils/http'
 export default {
     components: {
-        countDown
+        countDown,
+        machingEdit
     },
     props:{
         itemData:{
@@ -92,6 +130,7 @@ export default {
     },
     data(){
         return {
+            editShow: false,
             headList:[{
                 title:'时间',
                 width:120,
@@ -138,6 +177,38 @@ export default {
         },
         endCallback(){
 
+        },
+        // 删除求购
+        deleteBuyConf(id){
+            let _this = this;
+            this.$Modal.confirm({
+                content: '删除后无法撤销，是否继续？',
+                onOk(){
+                    _this.deleteBuy(id);
+                }
+            })
+        },
+        deleteBuy(id){
+            this.$http.post(deleteHandingBuy,{
+                handingId: id
+            }).then(res => {
+                if(res.data.status === 0){
+                    this.$emit('on-delete')
+                }else{
+                    this.$Message.error(res.data.errorMsg);
+                }
+            })
+        },
+        // 编辑求购
+        jumpToEdit(id){
+            this.$refs.edit.getDetial(id);
+            this.editShow = true;
+        },
+        // 调用子组件编辑事件
+        doEdit(){
+            this.$refs.edit.doEdit();
+            this.editShow = false;
+            this.$emit('on-delete')
         }
     }
 }
@@ -269,5 +340,11 @@ export default {
 
     .action-btn.status1{
         background-color: #f12e0f;
+    }
+
+    .eill .ivu-icon{
+        float: right;
+        margin-left: 10px;
+        cursor: pointer;
     }
 </style>

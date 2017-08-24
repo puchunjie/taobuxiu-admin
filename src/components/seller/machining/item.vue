@@ -6,13 +6,22 @@
                     <Col span="6">求购详情</Col>
                     <Col span="7" class="qg-count">&nbsp;</Col>
                     <Col span="11" class="qg-time">
-                        距离关闭时间:
-                        <count-down :style="{color:'red'}" 
-                        :endTime="deadTime" 
-                        :callback="endCallback" 
-                        endText="已经结束了"
-                        v-if="itemData.buy.status === 0 || itemData.buy.status === 3"></count-down>
-                        <span v-else="">已经结束了</span>
+                        <span v-if="itemData.buy.status === 0 || itemData.buy.status === 3">
+                            距离关闭时间:
+                            <count-down :style="{color:'red'}" 
+                            :endTime="deadTime" 
+                            :callback="endCallback" 
+                            endText="已经结束了"
+                            ></count-down>
+                        </span>
+                        <span v-if="itemData.buy.status === 4">
+                            成交时间：
+                            {{ new Date(itemData.buy.supplyWinTime) | moment("YYYY年MM月DD日 HH:mm") }}
+                        </span>
+                        <span v-if="itemData.buy.status === 1">
+                            过期时间：
+                            {{ new Date(itemData.buy.pushTime + itemData.buy.timeLimit) | moment("YYYY年MM月DD日 HH:mm") }}
+                        </span>
                     </Col>
                 </Row>
             </div>
@@ -76,6 +85,7 @@
                         </Form-item>
                         <Form-item>
                             <Button type="primary" @click="handleSubmit">立即报价</Button>
+                            <Button type="warning" @click="setMissingConf" style="margin-left: 8px">遗憾错过</Button>
                         </Form-item>
                     </Form>
 
@@ -110,7 +120,7 @@
 
 <script>
 import countDown from '@/components/com/countDown'
-import { offerHandingBuy } from '@/utils/http'
+import { offerHandingBuy, missMachingBuyOffer } from '@/utils/http'
 
 export default {
     components: {
@@ -164,6 +174,31 @@ export default {
                     }
                 });
             }
+        },
+        // 忽略报价
+        setMissingConf(){
+            let _this = this;
+            this.$Modal.confirm({
+                content:'忽略有将无法继续报价！是否继续？',
+                onOk () {
+                    _this.setMissing();
+                }
+            })
+        },
+        setMissing () {
+            let _this = this;
+            this.$http.post(missMachingBuyOffer,{
+                handingId: this.itemData.buy.id
+            }).then(res =>{
+                if(res.data.status === 0){
+                    this.$Message.success('忽略成功');
+                    setTimeout(function(){
+                        _this.$parent.init();
+                    },1000)
+                }else{
+                    this.$Message.error(res.data.errorMsg);
+                }
+            })
         },
         // js浮点运算乘法
         accMul(arg1,arg2) { 
