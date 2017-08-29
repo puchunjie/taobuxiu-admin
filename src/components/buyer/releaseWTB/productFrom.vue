@@ -246,10 +246,13 @@
                 }
             },
             tipHide(){
-                this.$refs.popTip.style.height = '0';
+                setTimeout(() => {
+                    this.$refs.popTip.style.height = '0';
+                }, 100);
             },
             // 填充数据
             fillData(item){
+                console.log(item)
                 let data = item.split("*");
                 let width = data[0];
                 let length = data[1];
