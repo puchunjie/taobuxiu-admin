@@ -51,7 +51,7 @@
             <template v-else-if="itemData.buy.status === 4">
                 恭喜您的报价已中标，请立即联系买家吧
             </template>
-            <template v-else-if="itemData.buy.status === 1">
+            <template v-else-if="itemData.buy.status === 6">
                 您的报价未中标
             </template>
         </div>
