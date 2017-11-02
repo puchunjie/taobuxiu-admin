@@ -1,25 +1,7 @@
 # iview2-manage-system
 
-基于Vue2 + iView2.0的后台管理系统解决方案简单示例.
+基于Vue2 + iView2.0的后台管理系统.
 
-线上访问(不支持手机 / 已修复访问速度过慢的问题)：[电脑访问](http://139.199.33.111/dist)
-
---------------
-
-### Notice
-* 3.31 修复导航栏浏览器返回不能更新当前选择项的bug；修复build err问题
-
---------------
-
-### 目前实现的功能及用到的组件
-- [x] 页面： [iView2.0](https://github.com/iview/iview)
-- [x] Markdown显示： [VueMarkdown](https://github.com/miaolz123/vue-markdown)
-- [x] Markdown编辑器： [MarkdownEditor](https://github.com/alecgorge/MarkdownEditor)&amp[Vue-SimpleMDE](https://github.com/F-loat/vue-simplemde)
-- [x] 富文本框： [quillEditor](https://github.com/surmon-china/vue-quill-editor)
-- [x] 图表： [百度Echarts](http://echarts.baidu.com)&amp[Vue-Echarts](https://github.com/xlsdg/vue-echarts-v3)
-- [x] 文件上传： [使用iView自带的文件上传组件](https://www.iviewui.com/components/upload)
-
---------------
 
 ### 使用
 ```
@@ -56,30 +38,3 @@ npm run build       // 生产部署
 	|-- package.json                           // 依赖及配置
 	|-- README.md                              // 简介
 	
---------------
-
-### 截图预览
-![1](https://github.com/vanishcode/iview2-management-system/raw/master/static/screenshots/s1.png)
-
-![2](https://github.com/vanishcode/iview2-management-system/raw/master/static/screenshots/s2.png)
-
-![3](https://github.com/vanishcode/iview2-management-system/raw/master/static/screenshots/s3.png)
-
-----------------
-
-### 存在的问题及维护说明
-1.字体路径有错误，下次更新将会修复
-
-2.本项目只是简单示例，实际应用还需自行添加需要实现的功能
-
-3.部分内容参考了 [Vue2 后台管理系统解决方案](https://github.com/lin-xin/manage-system)
-
----------------
-
-### 其他
-有任何问题或建议欢迎提出issue.
-
----------------
-
-### License
-[MIT](https://opensource.org/licenses/MIT)
